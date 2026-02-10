@@ -69,7 +69,7 @@ function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
-        <Router>
+        <Router basename="/life-journey-2.0/">
           <NavigationTracker />
           <AuthenticatedApp />
         </Router>
