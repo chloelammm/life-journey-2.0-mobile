@@ -3,9 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, BarChart3, Volume2, VolumeX } from 'lucide-react';
 
+import GameModeSelector from '@/components/game/GameModeSelector';
 import SetupScreen from '@/components/game/SetupScreen';
 import LargeGameBoard from '@/components/game/LargeGameBoard';
+import FinanceGameBoard from '@/components/game/FinanceGameBoard';
+import SubjectGameBoard from '@/components/game/SubjectGameBoard';
 import Dashboard from '@/components/game/Dashboard';
+import ExpandedDashboard from '@/components/game/ExpandedDashboard';
 import RadarChart from '@/components/game/RadarChart';
 import Dice from '@/components/game/Dice';
 import SpinWheel from '@/components/game/SpinWheel';
@@ -17,14 +21,21 @@ import CardDraw from '@/components/game/CardDraw';
 import MilestonePopup from '@/components/game/MilestonePopup';
 import PlayerProfile from '@/components/game/PlayerProfile';
 import ActivityBoard from '@/components/game/ActivityBoard';
+import SubjectQuiz from '@/components/game/SubjectQuiz';
+import FinanceEvent from '@/components/game/FinanceEvent';
+import JUPASSimulator from '@/components/game/JUPASSimulator';
 import { EVENT_CARDS, CAREER_TASKS, CANTONESE_VOICE, MILESTONES } from '@/components/game/GameData';
+import { FINANCE_EVENT_CARDS, FINANCE_TASKS, FINANCE_MILESTONES, FINANCE_VOICE } from '@/components/game/FinanceModeData';
+import { SUBJECT_EVENT_CARDS, SUBJECT_TASKS_PRIMARY, SUBJECT_TASKS_SECONDARY, SUBJECT_MILESTONES, SUBJECT_VOICE } from '@/components/game/SubjectModeData';
 
 export default function Game() {
-  // 遊戲狀態
-  const [gameState, setGameState] = useState('setup'); // setup, playing, finished
+  // 遊戲模式狀態
+  const [gameState, setGameState] = useState('mode_select'); // mode_select, setup, playing, finished
+  const [gameMode, setGameMode] = useState('career'); // career, finance, subject
+  const [ageGroup, setAgeGroup] = useState('secondary'); // primary, secondary
   const [soundEnabled, setSoundEnabled] = useState(true);
   
-  // 玩家數據
+  // 玩家數據（擴展版）
   const [player, setPlayer] = useState({
     name: '',
     age: 15,
@@ -37,6 +48,14 @@ export default function Game() {
     stableScore: 33,
     riskScore: 33,
     creativeScore: 33,
+    // 擴展指標
+    finance_skill: 50,
+    math_skill: 50,
+    social_network: 50,
+    adaptability: 50,
+    digital_literacy: 50,
+    // 學科興趣模式
+    recommendedStream: null,
     choicesHistory: [],
     completedTasks: []
   });
@@ -64,6 +83,19 @@ export default function Game() {
   const [message, setMessage] = useState('');
   const [eventsTriggered, setEventsTriggered] = useState(0);
   
+  // 新模式彈窗狀態
+  const [showSubjectQuiz, setShowSubjectQuiz] = useState(false);
+  const [showFinanceEvent, setShowFinanceEvent] = useState(false);
+  const [financeEventType, setFinanceEventType] = useState('random');
+  const [showJUPAS, setShowJUPAS] = useState(false);
+  
+  // 處理模式選擇
+  const handleModeSelect = ({ mode, ageGroup: age }) => {
+    setGameMode(mode);
+    setAgeGroup(age);
+    setGameState('setup');
+  };
+  
   // 開始遊戲
   const handleStart = (setupData) => {
     setPlayer(prev => ({
@@ -76,7 +108,20 @@ export default function Game() {
       creativeScore: setupData.initialTraits.creative || 33
     }));
     setGameState('playing');
-    showMessage(CANTONESE_VOICE.welcome);
+    const voice = getVoice();
+    showMessage(voice.welcome);
+    
+    // 學科興趣模式：開始時顯示興趣問卷
+    if (gameMode === 'subject') {
+      setTimeout(() => setShowSubjectQuiz(true), 1500);
+    }
+  };
+  
+  // 根據模式獲取語音（需要在handleStart之前定義）
+  const getVoice = () => {
+    if (gameMode === 'finance') return FINANCE_VOICE;
+    if (gameMode === 'subject') return SUBJECT_VOICE;
+    return CANTONESE_VOICE;
   };
   
   // 顯示訊息
@@ -118,21 +163,43 @@ export default function Game() {
     setCanRoll(true);
   };
   
+  // 根據模式獲取對應數據
+  const getEventCards = () => {
+    if (gameMode === 'finance') return FINANCE_EVENT_CARDS;
+    if (gameMode === 'subject') return SUBJECT_EVENT_CARDS;
+    return EVENT_CARDS;
+  };
+  
+  const getTasks = () => {
+    if (gameMode === 'finance') return FINANCE_TASKS;
+    if (gameMode === 'subject') return ageGroup === 'primary' ? SUBJECT_TASKS_PRIMARY : SUBJECT_TASKS_SECONDARY;
+    return CAREER_TASKS;
+  };
+  
+  const getMilestones = () => {
+    if (gameMode === 'finance') return FINANCE_MILESTONES;
+    if (gameMode === 'subject') return SUBJECT_MILESTONES;
+    return MILESTONES;
+  };
+  
   // 檢查事件觸發
   const checkForEvent = (position) => {
-    // 檢查是否完成遊戲（退休）
-    if (position >= 99) {
+    // 小學版50格，中學版100格
+    const maxPosition = ageGroup === 'primary' ? 49 : 99;
+    
+    // 檢查是否完成遊戲
+    if (position >= maxPosition) {
       setGameState('finished');
       setShowReport(true);
       return;
     }
     
-    // 事件觸發機率 (位置 2,4,6,8... 有事件)
+    // 事件觸發機率
     const shouldTriggerEvent = position % 2 === 0 || Math.random() < 0.4;
+    const eventCards = getEventCards();
     
-    if (shouldTriggerEvent && eventsTriggered < 10) {
-      // 隨機選擇事件
-      const availableEvents = EVENT_CARDS.filter(e => 
+    if (shouldTriggerEvent && eventsTriggered < 15) {
+      const availableEvents = eventCards.filter(e => 
         !player.choicesHistory.some(c => c.event_id === e.id)
       );
       
@@ -146,23 +213,29 @@ export default function Game() {
       }
     }
     
-    // 檢查是否觸發職業試工 (每5步一次機會)
-    if (position > 5 && position % 5 === 0 && player.path) {
-      const availableTasks = CAREER_TASKS.filter(t => 
-        t.path === player.path && !player.completedTasks.includes(t.id)
-      );
+    // 任務觸發 (每5步一次機會)
+    const tasks = getTasks();
+    if (position > 5 && position % 5 === 0) {
+      let availableTasks;
+      
+      if (gameMode === 'career' && player.path) {
+        availableTasks = tasks.filter(t => t.path === player.path && !player.completedTasks.includes(t.id));
+      } else {
+        availableTasks = tasks.filter(t => !player.completedTasks.includes(t.id));
+      }
       
       if (availableTasks.length > 0 && Math.random() < 0.5) {
         const randomTask = availableTasks[Math.floor(Math.random() * availableTasks.length)];
         setCurrentTask(randomTask);
         setShowCareerTask(true);
-        showMessage(CANTONESE_VOICE.task_start);
+        showMessage(gameMode === 'finance' ? '💰 理財挑戰！' : gameMode === 'subject' ? '📚 學習任務！' : CANTONESE_VOICE.task_start);
         return;
       }
     }
     
     // 檢查里程碑
-    const milestone = MILESTONES.find(m => 
+    const milestones = getMilestones();
+    const milestone = milestones.find(m => 
       m.position === position && !completedMilestones.some(cm => cm.id === m.id)
     );
     if (milestone) {
@@ -171,12 +244,26 @@ export default function Game() {
       return;
     }
     
-    // 隨機觸發卡片抽取 (30%機會)
-    if (Math.random() < 0.3 && position > 2) {
+    // 卡片抽取 (職業模式)
+    if (Math.random() < 0.3 && position > 2 && gameMode === 'career') {
       const cardTypes = ['value', 'superpower', 'skill'];
       const randomType = cardTypes[Math.floor(Math.random() * cardTypes.length)];
       setCardDrawType(randomType);
       setShowCardDraw(true);
+      return;
+    }
+    
+    // 理財模式：額外理財事件
+    if (gameMode === 'finance' && position > 10 && Math.random() < 0.3) {
+      const eventTypes = ['budget', 'investment', 'salary', 'expense'];
+      setFinanceEventType(eventTypes[Math.floor(Math.random() * eventTypes.length)]);
+      setShowFinanceEvent(true);
+      return;
+    }
+    
+    // 學科興趣模式：JUPAS模擬（中學生限定）
+    if (gameMode === 'subject' && ageGroup === 'secondary' && position >= 50 && position < 55 && !player.jupasCompleted) {
+      setShowJUPAS(true);
       return;
     }
     
@@ -229,9 +316,9 @@ export default function Game() {
     // 更新指標
     const effect = option.effect;
     setPlayer(prev => {
-      const newMoney = Math.max(0, Math.min(100, prev.money + effect.money));
-      const newStress = Math.max(0, Math.min(100, prev.stress + effect.stress));
-      const newHappiness = Math.max(0, Math.min(100, prev.happiness + effect.happiness));
+      const newMoney = Math.max(0, Math.min(100, prev.money + (effect.money || 0)));
+      const newStress = Math.max(0, Math.min(100, prev.stress + (effect.stress || 0)));
+      const newHappiness = Math.max(0, Math.min(100, prev.happiness + (effect.happiness || 0)));
       
       // 更新性格傾向
       let stableScore = prev.stableScore;
@@ -242,6 +329,13 @@ export default function Game() {
       if (option.trait === 'risk') riskScore = Math.min(100, riskScore + 8);
       if (option.trait === 'creative') creativeScore = Math.min(100, creativeScore + 8);
       
+      // 更新擴展指標（理財/學科模式）
+      const finance_skill = Math.min(100, prev.finance_skill + (effect.finance_skill || 0));
+      const math_skill = Math.min(100, prev.math_skill + (effect.math_skill || 0));
+      const social_network = Math.min(100, prev.social_network + (effect.social_network || 0));
+      const adaptability = Math.min(100, prev.adaptability + (effect.adaptability || 0));
+      const digital_literacy = Math.min(100, prev.digital_literacy + (effect.digital_literacy || 0));
+      
       return {
         ...prev,
         money: newMoney,
@@ -250,6 +344,11 @@ export default function Game() {
         stableScore,
         riskScore,
         creativeScore,
+        finance_skill,
+        math_skill,
+        social_network,
+        adaptability,
+        digital_literacy,
         choicesHistory: [...prev.choicesHistory, {
           event_id: currentEvent.id,
           choice: option.text,
@@ -296,9 +395,59 @@ export default function Game() {
     setCanRoll(true);
   };
   
+  // 處理興趣問卷完成
+  const handleSubjectQuizComplete = (result) => {
+    setShowSubjectQuiz(false);
+    setPlayer(prev => ({
+      ...prev,
+      recommendedStream: result.recommendedStream,
+      stableScore: prev.stableScore + (result.effects.stable || 0),
+      creativeScore: prev.creativeScore + (result.effects.creative || 0),
+      riskScore: prev.riskScore + (result.effects.risk || 0),
+      math_skill: prev.math_skill + (result.effects.math || 0),
+      digital_literacy: prev.digital_literacy + (result.effects.digital || 0),
+      social_network: prev.social_network + (result.effects.social || 0),
+      adaptability: prev.adaptability + (result.effects.adaptability || 0)
+    }));
+    showMessage(`🎯 推薦方向：${result.recommendedStream.name}！`);
+    setCanRoll(true);
+  };
+  
+  // 處理理財事件完成
+  const handleFinanceEventComplete = (result) => {
+    setShowFinanceEvent(false);
+    const effect = result.effect || {};
+    setPlayer(prev => ({
+      ...prev,
+      money: Math.max(0, Math.min(100, prev.money + (effect.money || 0))),
+      stress: Math.max(0, Math.min(100, prev.stress + (effect.stress || 0))),
+      happiness: Math.max(0, Math.min(100, prev.happiness + (effect.happiness || 0))),
+      finance_skill: Math.min(100, prev.finance_skill + (effect.finance_skill || 0)),
+      math_skill: Math.min(100, prev.math_skill + (effect.math_skill || 0))
+    }));
+    showMessage('💰 理財決定已完成！');
+    setCanRoll(true);
+  };
+  
+  // 處理JUPAS完成
+  const handleJUPASComplete = (result) => {
+    setShowJUPAS(false);
+    setPlayer(prev => ({
+      ...prev,
+      jupasCompleted: true,
+      jupasResult: result
+    }));
+    if (result.admitted) {
+      showMessage(`🎓 恭喜獲得 ${result.admitted.school} ${result.admitted.name} 取錄！`);
+    } else {
+      showMessage('💪 繼續努力，條條大路通羅馬！');
+    }
+    setCanRoll(true);
+  };
+  
   // 重新開始
   const handleRestart = () => {
-    setGameState('setup');
+    setGameState('mode_select');
     setPlayer({
       name: '',
       age: 15,
@@ -311,6 +460,12 @@ export default function Game() {
       stableScore: 33,
       riskScore: 33,
       creativeScore: 33,
+      finance_skill: 50,
+      math_skill: 50,
+      social_network: 50,
+      adaptability: 50,
+      digital_literacy: 50,
+      recommendedStream: null,
       choicesHistory: [],
       completedTasks: []
     });
@@ -323,9 +478,14 @@ export default function Game() {
     setCanRoll(true);
   };
   
+  // 模式選擇畫面
+  if (gameState === 'mode_select') {
+    return <GameModeSelector onSelect={handleModeSelect} />;
+  }
+  
   // 設置畫面
   if (gameState === 'setup') {
-    return <SetupScreen onStart={handleStart} />;
+    return <SetupScreen onStart={handleStart} ageGroup={ageGroup} gameMode={gameMode} />;
   }
   
   return (
@@ -419,16 +579,17 @@ export default function Game() {
       <div className="flex gap-4 p-4 max-w-[1600px] mx-auto">
         {/* 左側：控制面板 */}
         <div className="w-80 flex-shrink-0 space-y-4">
+                    
           {/* 骰子 */}
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg flex justify-center">
             <Dice onRoll={handleRoll} disabled={!canRoll} />
           </div>
-          
-          {/* 儀表板 */}
-          <Dashboard
-            money={player.money}
-            stress={player.stress}
-            happiness={player.happiness}
+
+          {/* 擴展儀表板 */}
+          <ExpandedDashboard
+            stats={player}
+            gameMode={gameMode}
+            ageGroup={ageGroup}
           />
           
           {/* 雷達圖 */}
@@ -439,7 +600,7 @@ export default function Game() {
               creative={player.creativeScore}
             />
           </div>
-          
+
           {/* 活動記錄板 */}
           <div className="h-96">
             <ActivityBoard 
@@ -449,13 +610,31 @@ export default function Game() {
           </div>
         </div>
         
-        {/* 中間：超大棋盤（可滾動） */}
-        <div className="flex-1 bg-white/50 rounded-3xl p-4 shadow-lg overflow-y-auto max-h-[85vh]">
-          <LargeGameBoard
-            playerPosition={player.position}
-            playerGender={player.gender}
-            currentPath={player.path}
-          />
+        {/* 中間：超大棋盤（可滾動）- 根據模式顯示不同棋盤 */}
+        <div className="flex-1 bg-white/50 rounded-3xl p-4 shadow-lg overflow-y-auto max-h-[calc(100vh-6rem)]">
+          {gameMode === 'career' && (
+            <LargeGameBoard
+              playerPosition={player.position}
+              playerGender={player.gender}
+              currentPath={player.path}
+            />
+          )}
+          {gameMode === 'finance' && (
+            <FinanceGameBoard
+              playerPosition={player.position}
+              playerGender={player.gender}
+              currentPath={player.path}
+              ageGroup={ageGroup}
+            />
+          )}
+          {gameMode === 'subject' && (
+            <SubjectGameBoard
+              playerPosition={player.position}
+              playerGender={player.gender}
+              currentPath={player.path}
+              ageGroup={ageGroup}
+            />
+          )}
         </div>
       </div>
       
@@ -526,6 +705,31 @@ export default function Game() {
         collectedSkills={collectedSkills}
         completedMilestones={completedMilestones}
         onClose={() => setShowPlayerProfile(false)}
+      />
+      
+      {/* 新模式彈窗 */}
+      <SubjectQuiz
+        isOpen={showSubjectQuiz}
+        ageGroup={ageGroup}
+        onComplete={handleSubjectQuizComplete}
+        onClose={() => { setShowSubjectQuiz(false); setCanRoll(true); }}
+      />
+      
+      <FinanceEvent
+        isOpen={showFinanceEvent}
+        eventType={financeEventType}
+        onComplete={handleFinanceEventComplete}
+        onClose={() => { setShowFinanceEvent(false); setCanRoll(true); }}
+      />
+      
+      <JUPASSimulator
+        isOpen={showJUPAS}
+        playerStats={player}
+        recommendedStream={player.recommendedStream?.name?.includes('STEM') ? 'stem' : 
+                          player.recommendedStream?.name?.includes('藝術') ? 'arts' :
+                          player.recommendedStream?.name?.includes('商業') ? 'business' : 'social'}
+        onComplete={handleJUPASComplete}
+        onClose={() => { setShowJUPAS(false); setCanRoll(true); }}
       />
     </div>
   );

@@ -271,7 +271,7 @@ export default function LargeGameBoard({
           initial={false}
           animate={{ 
             left: `${currentTile.x}%`, 
-            top: `${currentTile.y -2.5}%` 
+            top: `${currentTile.y -1}%` 
           }}
           transition={{ 
             type: "spring", 

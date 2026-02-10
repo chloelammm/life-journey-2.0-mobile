@@ -34,7 +34,7 @@ export default function Dice({ onRoll, disabled }) {
   };
   
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="absolute bottom-4 right-4">
       <motion.button
         onClick={handleRoll}
         disabled={rolling || disabled}
