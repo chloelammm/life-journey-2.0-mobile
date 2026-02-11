@@ -19,7 +19,7 @@ export default function SubjectGameBoard({
   // 學科模式Zigzag棋盤
   const generateSubjectBoard = () => {
     const tiles = [];
-    const gridSpacing = ageGroup === 'primary' ? 11.5 : 9.5;
+    const gridSpacing = ageGroup === 'primary' ? 11.5 : 16;
     const leftMargin = ageGroup === 'primary' ? 12 : 15;
     const rowHeight = ageGroup === 'primary' ? 8 : 5;
     
@@ -109,7 +109,7 @@ export default function SubjectGameBoard({
 
   const tiles = generateSubjectBoard();
   const currentTile = tiles.find(t => t.position === playerPosition);
-  const boardHeight = ageGroup === 'primary' ? '150vh' : '250vh';
+  const boardHeight = ageGroup === 'primary' ? '2000px' : '2000px';
 
   return (
     <div 
@@ -129,14 +129,14 @@ export default function SubjectGameBoard({
       </div>
 
       {/* 標題 */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
+      {/* <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
         <h2 className="text-2xl font-bold text-purple-800 bg-white/80 px-6 py-2 rounded-full shadow-lg">
           📚 學科探索之旅 📚
         </h2>
         <p className="text-center text-purple-600 text-sm mt-1">
           {ageGroup === 'primary' ? '小學版（50格）' : '中學版（100格）'}
         </p>
-      </div>
+      </div> */}
 
       {/* 路徑連線 */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>

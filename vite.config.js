@@ -4,7 +4,7 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/life-journey-2.0/',      
+  base: '/life-journey-2.0-mobile/',      
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

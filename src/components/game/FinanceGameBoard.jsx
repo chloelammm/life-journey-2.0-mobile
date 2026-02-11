@@ -14,14 +14,14 @@ export default function FinanceGameBoard({
   ageGroup = 'secondary'
 }) {
   const TOTAL_TILES = ageGroup === 'primary' ? 50 : 100;
-  const COLS = ageGroup === 'primary' ? 5 : 5;
+  const COLS = ageGroup === 'primary' ? 5 : 6;
   
   // 理財模式Zigzag棋盤
   const generateFinanceBoard = () => {
     const tiles = [];
-    const gridSpacing = ageGroup === 'primary' ? 11.5 : 9.5;
+    const gridSpacing = ageGroup === 'primary' ? 11.5 : 15;
     const leftMargin = ageGroup === 'primary' ? 12 : 15;
-    const rowHeight = ageGroup === 'primary' ? 8 : 5;
+    const rowHeight = ageGroup === 'primary' ? 8 : 5.75;
     
     // 理財事件位置
     const savingEvents = [5, 15, 25, 40, 55, 70, 85];
@@ -90,7 +90,7 @@ export default function FinanceGameBoard({
 
   const tiles = generateFinanceBoard();
   const currentTile = tiles.find(t => t.position === playerPosition);
-  const boardHeight = ageGroup === 'primary' ? '150vh' : '250vh';
+  const boardHeight = ageGroup === 'primary' ? '1500px' : '2000px';
 
   return (
     <div 
@@ -110,11 +110,11 @@ export default function FinanceGameBoard({
       </div>
 
       {/* 標題 */}
-      <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
+      {/* <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-30">
         <h2 className="text-2xl font-bold text-emerald-800 bg-white/80 px-6 py-2 rounded-full shadow-lg">
           💰 理財人生路 💰
         </h2>
-      </div>
+      </div> */}
 
       {/* 路徑連線 */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 5 }}>
@@ -239,7 +239,7 @@ export default function FinanceGameBoard({
         </motion.div>
       )}
 
-      {/* 路徑標籤 */}
+      {/* 路徑標籤
       <div className="absolute bottom-4 left-4 right-4 flex justify-around z-20">
         {[
           { name: '儲蓄之路', icon: '🏦', color: 'bg-green-500' },
@@ -252,7 +252,7 @@ export default function FinanceGameBoard({
             <span>{path.name}</span>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }
