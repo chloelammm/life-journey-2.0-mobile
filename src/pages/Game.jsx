@@ -1,3 +1,4 @@
+import { useIsMobile } from '@/hooks/use-mobile'; 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ import { FINANCE_EVENT_CARDS, FINANCE_TASKS, FINANCE_MILESTONES, FINANCE_VOICE }
 import { SUBJECT_EVENT_CARDS, SUBJECT_TASKS_PRIMARY, SUBJECT_TASKS_SECONDARY, SUBJECT_MILESTONES, SUBJECT_VOICE } from '@/components/game/SubjectModeData';
 
 export default function Game() {
+  const isMobile = useIsMobile();
   // 遊戲模式狀態
   const [gameState, setGameState] = useState('mode_select'); // mode_select, setup, playing, finished
   const [gameMode, setGameMode] = useState('career'); // career, finance, subject
@@ -575,44 +577,45 @@ export default function Game() {
         )}
       </AnimatePresence>
       
-      {/* 主遊戲區域 - 左右分欄 */}
-      <div className="flex gap-4 p-4 max-w-[1600px] mx-auto">
-        {/* 左側：控制面板 */}
-        <div className="w-80 flex-shrink-0 space-y-4">
-                    
-          {/* 骰子 */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg flex justify-center">
+{/* 主遊戲區域 - 響應式佈局修改 */}
+      <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4 p-4 max-w-[1600px] mx-auto`}>
+        
+        {/* 左側/頂部：控制面板 */}
+        <div className={`${isMobile ? 'w-full' : 'w-80'} flex-shrink-0 space-y-4`}>
+          
+          {/* 骰子 - 手機版時固定在頂部方便操作 */}
+          <div className={`bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg flex justify-center ${isMobile ? 'sticky top-[72px] z-30' : ''}`}>
             <Dice onRoll={handleRoll} disabled={!canRoll} />
           </div>
 
-          {/* 擴展儀表板 */}
-          <ExpandedDashboard
-            stats={player}
-            gameMode={gameMode}
-            ageGroup={ageGroup}
-          />
-          
-          {/* 雷達圖 */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-            <RadarChart
-              stable={player.stableScore}
-              risk={player.riskScore}
-              creative={player.creativeScore}
-            />
-          </div>
-
-          {/* 活動記錄板 */}
-          <div className="h-96">
-            <ActivityBoard 
-              choicesHistory={player.choicesHistory}
-              completedTasks={player.completedTasks}
-            />
-          </div>
+          {/* 電腦版顯示原始儀表板與雷達圖 */}
+          {!isMobile && (
+            <>
+              <ExpandedDashboard
+                stats={player}
+                gameMode={gameMode}
+                ageGroup={ageGroup}
+              />
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+                <RadarChart
+                  stable={player.stableScore}
+                  risk={player.riskScore}
+                  creative={player.creativeScore}
+                />
+              </div>
+              <div className="h-96">
+                <ActivityBoard 
+                  choicesHistory={player.choicesHistory}
+                  completedTasks={player.completedTasks}
+                />
+              </div>
+            </>
+          )}
         </div>
         
-        {/* 中間：超大棋盤（可滾動）- 根據模式顯示不同棋盤 */}
-        <div className="flex-1 bg-white/50 rounded-3xl p-4 shadow-lg overflow-y-auto max-h-[calc(100vh-6rem)]">
-          {gameMode === 'career' && (
+        {/* 中間：棋盤區域 - 手機版改為全寬 */}
+        {/* We remove fixed heights on mobile so the board can expand downwards naturally */}
+        <div className={`flex-1 bg-white/50 rounded-3xl shadow-lg ${isMobile ? 'w-full h-full min-h-screen' : 'p-4 overflow-y-auto max-h-[calc(100vh-6rem)]'}`}>          {gameMode === 'career' && (
             <LargeGameBoard
               playerPosition={player.position}
               playerGender={player.gender}
@@ -636,6 +639,31 @@ export default function Game() {
             />
           )}
         </div>
+
+        {/* 手機版：將儀表板與雷達圖移至棋盤下方 */}
+        {isMobile && (
+          <div className="w-full space-y-4 pt-4 pb-20">
+            <ExpandedDashboard
+              stats={player}
+              gameMode={gameMode}
+              ageGroup={ageGroup}
+            />
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+              <RadarChart
+                stable={player.stableScore}
+                risk={player.riskScore}
+                creative={player.creativeScore}
+              />
+            </div>
+            <div className="h-96">
+              <ActivityBoard 
+                choicesHistory={player.choicesHistory}
+                completedTasks={player.completedTasks}
+              />
+            </div>
+            
+          </div>
+        )}
       </div>
       
       {/* 彈窗 */}
@@ -649,13 +677,14 @@ export default function Game() {
         isOpen={showPathSelector}
         onSelect={handlePathSelect}
       />
-      
+      <div className="flex items-center justify-center">
       <CareerTask
         task={currentTask}
         isOpen={showCareerTask}
         onComplete={handleTaskComplete}
         onClose={() => { setShowCareerTask(false); setCanRoll(true); }}
       />
+      </div>
       
       <AIAnalysis
         isOpen={showAIAnalysis}

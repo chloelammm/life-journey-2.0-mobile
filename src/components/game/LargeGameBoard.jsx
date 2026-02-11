@@ -16,11 +16,11 @@ export default function LargeGameBoard({
   // Jumanji風格Zigzag棋盤 - 100格
   const generateJumanjiBoard = () => {
     const tiles = [];
-    const COLS = 10; // 每行10格
+    const COLS = 5; // 每行格
     const TOTAL_TILES = 100; // 總共100格
-    const gridSpacing = 10; // 格子間距（%）
-    const leftMargin = 3; // 左邊距
-    const rowHeight = 9.5; // 行高（%）
+    const gridSpacing = 19.5; // 格子間距（%）
+    const leftMargin = 15; // 左邊距
+    const rowHeight = 4.75; // 行高（%）
     
     // 事件格子列表（特定位置觸發事件）
     const eventPositions = [4, 8, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85, 91, 96];
@@ -48,7 +48,8 @@ export default function LargeGameBoard({
         name: '',
         icon: '',
         x: leftMargin + actualCol * gridSpacing,
-        y: 96 - row * rowHeight,
+        y: 4 + (row * rowHeight), // Starts at the top and goes DOWN
+        //y: 96 - row * rowHeight,
         size: 'normal',
         path: pos <= 25 ? null : undefined // 前25格共同路徑
       };
@@ -112,8 +113,11 @@ export default function LargeGameBoard({
   const pathLines = generatePathLines();
   
   return (
-    <div className="relative w-full h-[250vh] bg-gradient-to-b from-amber-50 via-orange-50 via-rose-50 to-purple-50 rounded-3xl overflow-visible shadow-2xl border-8 border-amber-300">
-      {/* Jumanji風格木紋 */}
+<div 
+  className="relative w-full bg-gradient-to-b from-amber-50 via-orange-50 via-rose-50 to-purple-50 rounded-3xl overflow-y-auto shadow-2xl border-8 border-amber-300"
+  style={{ height: '1500px' }} 
+>
+    {/* Jumanji風格木紋 */}
       <div className="absolute inset-0 opacity-10" style={{
         backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139, 69, 19, 0.1) 50px, rgba(139, 69, 19, 0.1) 52px)`,
       }} />
@@ -130,7 +134,7 @@ export default function LargeGameBoard({
         <span className="absolute top-[85%] right-[15%] text-3xl opacity-20">🌆</span>
       </div>
       
-      {/* 路徑標籤 */}
+      {/* 路徑標籤
       <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
         {Object.entries(BOARD_PATHS.paths).map(([key, path]) => (
           <span 
@@ -141,7 +145,7 @@ export default function LargeGameBoard({
             {path.icon} {path.name}
           </span>
         ))}
-      </div>
+      </div> */}
       
       {/* 路徑連線 */}
       <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }}>

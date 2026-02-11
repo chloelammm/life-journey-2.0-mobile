@@ -14,13 +14,13 @@ export default function SubjectGameBoard({
   ageGroup = 'secondary'
 }) {
   const TOTAL_TILES = ageGroup === 'primary' ? 50 : 100;
-  const COLS = ageGroup === 'primary' ? 8 : 10;
+  const COLS = ageGroup === 'primary' ? 5 : 5;
   
   // 學科模式Zigzag棋盤
   const generateSubjectBoard = () => {
     const tiles = [];
     const gridSpacing = ageGroup === 'primary' ? 11.5 : 9.5;
-    const leftMargin = ageGroup === 'primary' ? 5 : 3;
+    const leftMargin = ageGroup === 'primary' ? 12 : 15;
     const rowHeight = ageGroup === 'primary' ? 8 : 5;
     
     // 學科事件位置
@@ -265,7 +265,7 @@ export default function SubjectGameBoard({
       )}
 
       {/* 路徑標籤 */}
-      <div className="absolute bottom-4 left-4 right-4 flex justify-around z-20">
+      {/* <div className="absolute bottom-4 left-4 right-4 flex justify-around z-20">
         {[
           { name: 'STEM理科', icon: '🔬', color: 'bg-blue-500' },
           { name: '人文藝術', icon: '🎨', color: 'bg-purple-500' },
@@ -277,7 +277,7 @@ export default function SubjectGameBoard({
             <span>{path.name}</span>
           </div>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

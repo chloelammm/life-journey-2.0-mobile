@@ -14,13 +14,13 @@ export default function FinanceGameBoard({
   ageGroup = 'secondary'
 }) {
   const TOTAL_TILES = ageGroup === 'primary' ? 50 : 100;
-  const COLS = ageGroup === 'primary' ? 8 : 10;
+  const COLS = ageGroup === 'primary' ? 5 : 5;
   
   // 理財模式Zigzag棋盤
   const generateFinanceBoard = () => {
     const tiles = [];
     const gridSpacing = ageGroup === 'primary' ? 11.5 : 9.5;
-    const leftMargin = ageGroup === 'primary' ? 5 : 3;
+    const leftMargin = ageGroup === 'primary' ? 12 : 15;
     const rowHeight = ageGroup === 'primary' ? 8 : 5;
     
     // 理財事件位置

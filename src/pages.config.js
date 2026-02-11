@@ -1,4 +1,5 @@
 /**
+ * import MobileScreen from './src/components/game/MobileScreen';
  * pages.config.js - Page routing configuration
  * 
  * This file is AUTO-GENERATED. Do not add imports or modify PAGES manually.
@@ -21,6 +22,7 @@
  *   
  *   export const pagesConfig = {
  *       mainPage: "HomePage",
+ *      'game': MobileScreen, 
  *       Pages: PAGES,
  *   };
  * 
