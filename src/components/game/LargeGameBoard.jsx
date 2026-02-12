@@ -9,30 +9,36 @@ const PLAYER_AVATARS = {
 };
 
 export default function LargeGameBoard({ 
-  playerPosition, 
-  playerGender, 
+playerPosition = 0, 
+  playerGender = 'male', 
+  ageGroup = 'secondary',
   currentPath
 }) {
-  // Jumanji風格Zigzag棋盤 - 100格
+
+  const isPrimary = ageGroup === 'primary';
+  const TOTAL_TILES = isPrimary ? 50 : 100;
+  const COLS = 5;
+  const gridSpacing = isPrimary ? 16 : 19.5; 
+  const leftMargin = 15;
+  const rowHeight = isPrimary ? 9 : 4.75;
+  const boardHeight = isPrimary ? '1000px' : '2000px';
+  
+     // Jumanji風格Zigzag棋盤 - 100格
   const generateJumanjiBoard = () => {
     const tiles = [];
-    const COLS = 5; // 每行格
-    const TOTAL_TILES = 100; // 總共100格
-    const gridSpacing = 19.5; // 格子間距（%）
-    const leftMargin = 15; // 左邊距
-    const rowHeight = 4.75; // 行高（%）
-    
+
     // 事件格子列表（特定位置觸發事件）
     const eventPositions = [4, 8, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85, 91, 96];
     const milestonePositions = [10, 20, 30, 40, 50, 60, 70, 80, 90];
     
+    const lastTileIndex = TOTAL_TILES - 1; 
     // 特殊格子定義
     const specialTiles = {
       0: { name: '起點', icon: '🏛️', type: 'start', size: 'large' },
       6: { name: '小學', icon: '📚', type: 'milestone' },
       15: { name: '中學', icon: '🎒', type: 'milestone' },
       25: { name: '分岔路', icon: '🔀', type: 'junction', size: 'large' },
-      99: { name: '退休', icon: '🏝️', type: 'end', size: 'large' }
+      [lastTileIndex]: { name: '退休', icon: '🏝️', type: 'end', size: 'large' }
     };
     
     for (let pos = 0; pos < TOTAL_TILES; pos++) {
@@ -71,7 +77,7 @@ export default function LargeGameBoard({
         tileData.name = '里程碑';
       }
       // 普通格子（每隔幾格有名稱）
-      else if (pos % 5 === 0 && pos > 25 && pos < 99) {
+      else if (pos % 5 === 0 && pos > 25 && pos < lastTileIndex) {
         const names = ['學習', '工作', '社交', '健康', '財富', '成長', '挑戰', '機會'];
         tileData.name = names[Math.floor(Math.random() * names.length)];
         tileData.icon = ['📖', '💼', '🤝', '🏃', '💰', '🌱', '⚔️', '🎁'][Math.floor(Math.random() * 8)];
@@ -115,7 +121,7 @@ export default function LargeGameBoard({
   return (
 <div 
   className="relative w-full bg-gradient-to-b from-amber-50 via-orange-50 via-rose-50 to-purple-50 rounded-3xl overflow-y-auto shadow-2xl border-8 border-amber-300"
-  style={{ height: '1500px' }} 
+  style={{ height: boardHeight }} 
 >
     {/* Jumanji風格木紋 */}
       <div className="absolute inset-0 opacity-10" style={{

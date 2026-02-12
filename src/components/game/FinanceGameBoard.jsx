@@ -19,8 +19,8 @@ export default function FinanceGameBoard({
   // 理財模式Zigzag棋盤
   const generateFinanceBoard = () => {
     const tiles = [];
-    const gridSpacing = ageGroup === 'primary' ? 11.5 : 15;
-    const leftMargin = ageGroup === 'primary' ? 12 : 15;
+    const gridSpacing = ageGroup === 'primary' ? 15 : 15;
+    const leftMargin = ageGroup === 'primary' ? 15 : 15;
     const rowHeight = ageGroup === 'primary' ? 8 : 5.75;
     
     // 理財事件位置
@@ -91,7 +91,7 @@ export default function FinanceGameBoard({
 
   const tiles = generateFinanceBoard();
   const currentTile = tiles.find(t => t.position === playerPosition);
-  const boardHeight = ageGroup === 'primary' ? '1500px' : '2000px';
+  const boardHeight = ageGroup === 'primary' ? '1000px' : '2000px';
 
   return (
     <div 

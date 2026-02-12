@@ -19,9 +19,9 @@ export default function SubjectGameBoard({
   // 學科模式Zigzag棋盤
   const generateSubjectBoard = () => {
     const tiles = [];
-    const gridSpacing = ageGroup === 'primary' ? 11.5 : 16;
-    const leftMargin = ageGroup === 'primary' ? 12 : 15;
-    const rowHeight = ageGroup === 'primary' ? 8 : 5;
+    const gridSpacing = ageGroup === 'primary' ? 16 : 16;
+    const leftMargin = ageGroup === 'primary' ? 15 : 15;
+    const rowHeight = ageGroup === 'primary' ? 9 : 5;
     
     // 學科事件位置
     const mathEvents = [4, 12, 22, 32, 42, 52, 68, 82];
@@ -110,7 +110,7 @@ export default function SubjectGameBoard({
 
   const tiles = generateSubjectBoard();
   const currentTile = tiles.find(t => t.position === playerPosition);
-  const boardHeight = ageGroup === 'primary' ? '2000px' : '2000px';
+  const boardHeight = ageGroup === 'primary' ? '1000px' : '2000px';
 
   return (
     <div 
