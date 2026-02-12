@@ -49,7 +49,8 @@ export default function FinanceGameBoard({
         name: '',
         icon: '',
         x: leftMargin + actualCol * gridSpacing,
-        y: 96 - row * rowHeight,
+        y: 4 + (row * rowHeight), // Starts at the top and goes DOWN
+//      y: 96 - row * rowHeight,
         size: 'normal',
         path: pos <= 25 ? null : undefined
       };

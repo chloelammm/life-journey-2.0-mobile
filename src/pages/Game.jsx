@@ -578,93 +578,63 @@ export default function Game() {
       </AnimatePresence>
       
 {/* 主遊戲區域 - 響應式佈局修改 */}
-      <div className={`flex ${isMobile ? 'flex-col' : 'flex-row'} gap-4 p-4 max-w-[1600px] mx-auto`}>
-        
-        {/* 左側/頂部：控制面板 */}
-        <div className={`${isMobile ? 'w-full' : 'w-80'} flex-shrink-0 space-y-4`}>
-          
-          {/* 骰子 - 手機版時固定在頂部方便操作 */}
-          <div className={`bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg flex justify-center ${isMobile ? 'sticky top-[72px] z-30' : ''}`}>
-            <Dice onRoll={handleRoll} disabled={!canRoll} />
-          </div>
+{/* 主遊戲區域 - Fixed Order for Mobile View */}
+<div className="flex flex-col gap-4 p-4 max-w-md mx-auto">
+  {/* 1. DICE AREA (Right below HUD) */}
+  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg flex justify-center sticky top-[72px] z-30">
+    <Dice onRoll={handleRoll} disabled={!canRoll} />
+  </div>
 
-          {/* 電腦版顯示原始儀表板與雷達圖 */}
-          {!isMobile && (
-            <>
-              <ExpandedDashboard
-                stats={player}
-                gameMode={gameMode}
-                ageGroup={ageGroup}
-              />
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-                <RadarChart
-                  stable={player.stableScore}
-                  risk={player.riskScore}
-                  creative={player.creativeScore}
-                />
-              </div>
-              <div className="h-96">
-                <ActivityBoard 
-                  choicesHistory={player.choicesHistory}
-                  completedTasks={player.completedTasks}
-                />
-              </div>
-            </>
-          )}
-        </div>
-        
-        {/* 中間：棋盤區域 - 手機版改為全寬 */}
-        {/* We remove fixed heights on mobile so the board can expand downwards naturally */}
-        <div className={`flex-1 bg-white/50 rounded-3xl shadow-lg ${isMobile ? 'w-full h-full min-h-screen' : 'p-4 overflow-y-auto max-h-[calc(100vh-6rem)]'}`}>          {gameMode === 'career' && (
-            <LargeGameBoard
-              playerPosition={player.position}
-              playerGender={player.gender}
-              currentPath={player.path}
-            />
-          )}
-          {gameMode === 'finance' && (
-            <FinanceGameBoard
-              playerPosition={player.position}
-              playerGender={player.gender}
-              currentPath={player.path}
-              ageGroup={ageGroup}
-            />
-          )}
-          {gameMode === 'subject' && (
-            <SubjectGameBoard
-              playerPosition={player.position}
-              playerGender={player.gender}
-              currentPath={player.path}
-              ageGroup={ageGroup}
-            />
-          )}
-        </div>
+  {/* 2. GAMEBOARD AREA (Center) */}
+  {/* We ensure this is relative so the board elements position correctly inside */}
+  <div className="w-full bg-white/50 rounded-3xl shadow-lg relative min-h-[600px]">
+    {gameMode === 'career' && (
+      <LargeGameBoard
+        playerPosition={player.position}
+        playerGender={player.gender}
+        currentPath={player.path}
+      />
+    )}
+    {gameMode === 'finance' && (
+      <FinanceGameBoard
+        playerPosition={player.position}
+        playerGender={player.gender}
+        currentPath={player.path}
+        ageGroup={ageGroup}
+      />
+    )}
+    {gameMode === 'subject' && (
+      <SubjectGameBoard
+        playerPosition={player.position}
+        playerGender={player.gender}
+        currentPath={player.path}
+        ageGroup={ageGroup}
+      />
+    )}
+  </div>
 
-        {/* 手機版：將儀表板與雷達圖移至棋盤下方 */}
-        {isMobile && (
-          <div className="w-full space-y-4 pt-4 pb-20">
-            <ExpandedDashboard
-              stats={player}
-              gameMode={gameMode}
-              ageGroup={ageGroup}
-            />
-            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
-              <RadarChart
-                stable={player.stableScore}
-                risk={player.riskScore}
-                creative={player.creativeScore}
-              />
-            </div>
-            <div className="h-96">
-              <ActivityBoard 
-                choicesHistory={player.choicesHistory}
-                completedTasks={player.completedTasks}
-              />
-            </div>
-            
-          </div>
-        )}
-      </div>
+  {/* 3. DIAGRAMS & DASHBOARD (Bottom) */}
+  <div className="w-full space-y-4 pt-4 pb-20">
+    <ExpandedDashboard
+      stats={player}
+      gameMode={gameMode}
+      ageGroup={ageGroup}
+    />
+    <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg">
+      <RadarChart
+        stable={player.stableScore}
+        risk={player.riskScore}
+        creative={player.creativeScore}
+      />
+    </div>
+    <div className="h-96">
+      <ActivityBoard 
+        choicesHistory={player.choicesHistory}
+        completedTasks={player.completedTasks}
+      />
+    </div>
+  </div>
+</div>
       
       {/* 彈窗 */}
       <SpinWheel

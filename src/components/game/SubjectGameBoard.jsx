@@ -59,7 +59,8 @@ export default function SubjectGameBoard({
         name: '',
         icon: '',
         x: leftMargin + actualCol * gridSpacing,
-        y: 96 - row * rowHeight,
+        y: 4 + (row * rowHeight), // Starts at the top and goes DOWN
+//      y: 96 - row * rowHeight,
         size: 'normal',
         path: pos <= (ageGroup === 'primary' ? 25 : 35) ? null : undefined
       };

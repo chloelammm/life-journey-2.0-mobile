@@ -86,3 +86,46 @@
     @apply bg-background text-foreground;
   }
 }
+@media (min-width: 768px) {
+  body {
+    background-color: #f3f0ea; /* The light background from your screenshot */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Start from top so it doesn't float in middle */
+    height: 100vh;
+    overflow: hidden; 
+  }
+
+  #root {
+    width: 414px; /* iPhone width */
+    height: 100vh;
+    background: white;
+    box-shadow: 0 0 50px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* This ensures the game content is what actually scrolls */
+  #root > div {
+    flex: 1;
+    overflow-y: auto; 
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+}
+/* Constrain all fixed overlays to the mobile width on desktop */
+@media (min-width: 768px) {
+  /* Target the modal backdrop. 
+     We remove the transform and use margin auto for perfect centering.
+  */
+  .fixed.inset-0.z-50 {
+    left: 0 !important;
+    right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 414px !important; /* Must match your #root width */
+    height: 100% !important;
+  }
+}
