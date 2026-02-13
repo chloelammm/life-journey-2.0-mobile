@@ -213,7 +213,7 @@ export default function SubjectGameBoard({
               
               {!isBlank && (
                 <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-purple-800 text-white rounded-full flex items-center justify-center text-[8px] font-bold shadow-md">
-                  {tile.position}
+                  {tile.position + 1}
                 </div>
               )}
               

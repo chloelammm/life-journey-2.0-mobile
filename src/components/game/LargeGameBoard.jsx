@@ -17,6 +17,7 @@ playerPosition = 0,
 
   const isPrimary = ageGroup === 'primary';
   const TOTAL_TILES = isPrimary ? 50 : 100;
+  const lastTileIndex = TOTAL_TILES - 1; 
   const COLS = 5;
   const gridSpacing = isPrimary ? 16 : 19.5; 
   const leftMargin = 15;
@@ -31,7 +32,6 @@ playerPosition = 0,
     const eventPositions = [4, 8, 13, 19, 25, 31, 37, 43, 49, 55, 61, 67, 73, 79, 85, 91, 96];
     const milestonePositions = [10, 20, 30, 40, 50, 60, 70, 80, 90];
     
-    const lastTileIndex = TOTAL_TILES - 1; 
     // 特殊格子定義
     const specialTiles = {
       0: { name: '起點', icon: '🏛️', type: 'start', size: 'large' },
@@ -248,7 +248,7 @@ playerPosition = 0,
               {/* 格子編號 */}
               {!isBlank && (
                 <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-slate-800 text-white rounded-full flex items-center justify-center text-[8px] font-bold shadow-md">
-                  {tile.position}
+                  {tile.position + 1}
                 </div>
               )}
               

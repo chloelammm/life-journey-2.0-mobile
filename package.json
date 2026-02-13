@@ -3,7 +3,7 @@
   "private": true,
   "version": "2.0.0",
   "type": "module",
-  "homepage": "https://github.com/chloelammm/life-journey-2.0-mobile/",
+  "homepage": "https://chloelammm.github.io/life-journey-2.0-mobile/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

@@ -590,6 +590,7 @@ export default function Game() {
   <div className="w-full bg-white/50 rounded-3xl shadow-lg relative min-h-[600px]">
     {gameMode === 'career' && (
       <LargeGameBoard
+        ageGroup={ageGroup}
         playerPosition={player.position}
         playerGender={player.gender}
         currentPath={player.path}
